@@ -6,6 +6,7 @@ const userSchema = new Schema({
   name: {
     type: String,
     required: true,
+    unique: true,
   },
   email: {
     type: String,
@@ -18,7 +19,8 @@ const userSchema = new Schema({
     minlength: 9,
   },
   blogs: [{ 
-    type: mongoose.Types.ObjectId, ref: "Blog", 
+    type: mongoose.Types.ObjectId, 
+    ref: "Blog", 
     required: true 
   }],
 });

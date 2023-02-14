@@ -1,4 +1,4 @@
-import User from "../model/User";
+import User from "../schemas/User.schema";
 import bcrypt from "bcryptjs";
 
 export const getUsers = async (req, res) => {
@@ -6,12 +6,28 @@ export const getUsers = async (req, res) => {
   try {
     users = await User.find();
   } catch (e) {
-    console.log(e);
+    return console.log(e);
   }
   if (!users) {
-    return res.status(404).json({ message: "No Users Found" });
+    return res.status(404).json({ 
+      message: "No Users Found" 
+    });
   }
   return res.status(200).json({ users });
+};
+
+export const getUserById = async (req, res) => {
+  const id = req.params.id;
+  let user;
+  try {
+    user = await User.findById(id);
+  } catch (e) {
+    return console.log(e);
+  }
+  if (!user) {
+    return res.status(404).json({ message: "No User Found" });
+  }
+  return res.status(200).json({ user });
 };
 
 export const signup = async (req, res) => {
@@ -45,7 +61,7 @@ export const signup = async (req, res) => {
 };
 
 
-export const login = async (req, res, next) => {
+export const login = async (req, res) => {
   const { email, password } = req.body;
   let myUser;
   try {

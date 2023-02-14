@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
-import Blog from "../model/Blog";
-import User from "../model/User";
+import Blog from "../schemas/Blog.schema";
+import User from "../schemas/User.schema";
 
 export const getBlogs = async (req, res) => {
   let myBlogs;
   try {
-    myBlogs = await Blog.find().populate("user");
+    myBlogs = await Blog.find();
   } catch (err) {
     return console.log(err);
   }
@@ -16,11 +16,11 @@ export const getBlogs = async (req, res) => {
 };
 
 export const addBlog = async (req, res) => {
-  const { title, description, image, user } = req.body;
+  const { title, description, writer } = req.body;
 
   let myUser;
   try {
-    myUser = await User.findById(user);
+    myUser = await User.findById(writer);
   } catch (e) {
     return console.log(e);
   }
@@ -30,8 +30,7 @@ export const addBlog = async (req, res) => {
   const blog = new Blog({
     title,
     description,
-    image,
-    user,
+    writer,
   });
   try {
     const session = await mongoose.startSession();
@@ -67,7 +66,7 @@ export const updateBlog = async (req, res) => {
   return res.status(200).json({ blog });
 };
 
-export const getById = async (req, res, next) => {
+export const getBlogById = async (req, res) => {
   const id = req.params.id;
   let blog;
   try {
@@ -81,12 +80,12 @@ export const getById = async (req, res, next) => {
   return res.status(200).json({ blog });
 };
 
-export const deleteBlog = async (req, res, next) => {
+export const deleteBlog = async (req, res) => {
   const id = req.params.id;
 
   let blog;
   try {
-    blog = await Blog.findByIdAndRemove(id).populate("user");
+    blog = await Blog.findByIdAndRemove(id).populate("blog");
     await blog.user.blogs.pull(blog);
     await blog.user.save();
   } catch (e) {
@@ -98,7 +97,7 @@ export const deleteBlog = async (req, res, next) => {
   return res.status(200).json({ message: "Successfully Delete" });
 };
 
-export const getByUserId = async (req, res, next) => {
+export const getByUserId = async (req, res) => {
   const userId = req.params.id;
   let userBlogs;
   try {
