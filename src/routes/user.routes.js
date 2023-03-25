@@ -7,4 +7,5 @@ userRouter.get("/", getUsers);
 userRouter.get("/:id", getUserById);
 userRouter.post("/signup", signup);
 userRouter.post("/login", login);
+
 export default userRouter;

@@ -3,21 +3,22 @@ import mongoose from "mongoose";
 import blogRouter from "./routes/blog.routes";
 import userRouter from "./routes/user.routes";
 import cors from "cors";
+import dotenv from "dotenv";
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+dotenv.config();
 
 app.use("/user", userRouter);
 app.use("/blog", blogRouter);
 
 mongoose.connect(
-    'mongodb+srv://admin:12345@cluster0.j8jahyb.mongodb.net/Blogdb?retryWrites=true&w=majority'
+    `mongodb+srv://admin:${process.env.DB_PASS}@cluster0.j8jahyb.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`
 )
-.then(()=>app.listen(3000))
+.then(()=>app.listen(process.env.PORT || 3000))
 .then(()=>
-  console.log('Connected on database on port 3000')
+  console.log(`Connected on database on port ${process.env.PORT}`)
 )
 .catch((error)=>console.log(error))
-
