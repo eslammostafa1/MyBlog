@@ -1,5 +1,5 @@
-import User from "../schemas/User.schema";
 import bcrypt from "bcryptjs";
+import User from "../schemas/User.schema";
 
 export const getUsers = async (req, res) => {
   let users;
@@ -9,15 +9,15 @@ export const getUsers = async (req, res) => {
     return console.log(e);
   }
   if (!users) {
-    return res.status(404).json({ 
-      message: "No Users Found" 
+    return res.status(404).json({
+      message: "No Users Found",
     });
   }
   return res.status(200).json({ users });
 };
 
 export const getUserById = async (req, res) => {
-  const id = req.params.id;
+  const { id } = req.params;
   let user;
   try {
     user = await User.findById(id);
@@ -60,7 +60,6 @@ export const signup = async (req, res) => {
   return res.status(201).json({ user });
 };
 
-
 export const login = async (req, res) => {
   const { email, password } = req.body;
   let myUser;
@@ -74,7 +73,7 @@ export const login = async (req, res) => {
   }
 
   const truePassword = bcrypt.compareSync(password, myUser.password);
-  
+
   if (!truePassword) {
     return res.status(400).json({ message: "Incorrect Password" });
   }

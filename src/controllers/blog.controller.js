@@ -40,8 +40,8 @@ export const addBlog = async (req, res) => {
     await myUser.save({ session });
     await session.commitTransaction();
   } catch (err) {
-    console.log(e);
-    return res.status(500).json({ message: e });
+    console.log(err);
+    return res.status(500).json({ message: err });
   }
 
   return res.status(200).json({ blog });
@@ -67,7 +67,7 @@ export const updateBlog = async (req, res) => {
 };
 
 export const getBlogById = async (req, res) => {
-  const id = req.params.id;
+  const { id } = req.params;
   let blog;
   try {
     blog = await Blog.findById(id);
@@ -81,7 +81,7 @@ export const getBlogById = async (req, res) => {
 };
 
 export const deleteBlog = async (req, res) => {
-  const id = req.params.id;
+  const { id } = req.params;
 
   let blog;
   try {

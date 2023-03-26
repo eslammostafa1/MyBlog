@@ -7,6 +7,7 @@ import {
   getByUserId,
   updateBlog,
 } from "../controllers/blog.controller";
+
 const blogRouter = express.Router();
 
 blogRouter.get("/", getBlogs);

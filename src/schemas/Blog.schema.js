@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const Schema = mongoose.Schema;
+const { Schema } = mongoose;
 
 const blogSchema = new Schema({
   title: {
@@ -21,5 +21,5 @@ const blogSchema = new Schema({
     required: true,
   },
 });
-  
+
 export default mongoose.model("Blog", blogSchema);
