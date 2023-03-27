@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import User from "../schemas/User.schema";
+import { signupUserValidation, loginUserValidation } from "../validators/user.validator";
 
 export const getUsers = async (req, res) => {
   let users;
@@ -31,17 +32,32 @@ export const getUserById = async (req, res) => {
 };
 
 export const signup = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { error, value } = signupUserValidation.validate(req.body, { abortEarly: false });
+  if (error) {
+    console.log(error);
+    return res.send(error.details);
+  }
+  const {
+    name, email, password, confirmPassword,
+  } = value;
+
   let myUser;
   try {
     myUser = await User.findOne({ email });
   } catch (e) {
     return console.log(e);
   }
+
   if (myUser) {
     return res
       .status(400)
       .json({ message: "User Exists!" });
+  }
+
+  if (password !== confirmPassword) {
+    return res
+      .status(400)
+      .json({ message: "Wrong password" });
   }
   const hashedPassword = bcrypt.hashSync(password);
 
@@ -54,6 +70,7 @@ export const signup = async (req, res) => {
 
   try {
     await user.save();
+    console.log("user created");
   } catch (e) {
     return console.log(e);
   }
@@ -61,7 +78,14 @@ export const signup = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  const { email, password } = req.body;
+  const { error, value } = loginUserValidation.validate(req.body, { abortEarly: false });
+
+  if (error) {
+    console.log(error);
+    return res.send(error.details);
+  }
+
+  const { email, password } = value;
   let myUser;
   try {
     myUser = await User.findOne({ email });
