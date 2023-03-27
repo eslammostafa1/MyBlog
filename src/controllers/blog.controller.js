@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import Blog from "../schemas/Blog.schema";
 import User from "../schemas/User.schema";
+import blogValidation from "../validators/blog.validator";
 
 export const getBlogs = async (req, res) => {
   let myBlogs;
@@ -16,7 +17,12 @@ export const getBlogs = async (req, res) => {
 };
 
 export const addBlog = async (req, res) => {
-  const { title, description, writer } = req.body;
+  const { error, value } = blogValidation.validate(req.body, { abortEarly: false });
+  if (error) {
+    console.log(error);
+    return res.send(error.details);
+  }
+  const { title, description, writer } = value;
 
   let myUser;
   try {
