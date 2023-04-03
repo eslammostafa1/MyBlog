@@ -1,20 +1,13 @@
 import express from "express";
-import {
-  addBlog,
-  deleteBlog,
-  getBlogs,
-  getBlogById,
-  getByUserId,
-  updateBlog,
-} from "../controllers/blog.controller";
+import blogController from "../controllers/blog.controller";
 
 const blogRouter = express.Router();
 
-blogRouter.get("/", getBlogs);
-blogRouter.post("/add", addBlog);
-blogRouter.put("/update/:id", updateBlog);
-blogRouter.get("/:id", getBlogById);
-blogRouter.delete("/:id", deleteBlog);
-blogRouter.get("/user/:id", getByUserId);
+blogRouter.get("/", blogController.getBlogs);
+blogRouter.post("/add", blogController.addBlog);
+blogRouter.put("/update/:id", blogController.updateBlog);
+blogRouter.get("/:id", blogController.getBlogById);
+blogRouter.delete("/:id", blogController.deleteBlog);
+blogRouter.get("/user/:id", blogController.getByUserId);
 
 export default blogRouter;
