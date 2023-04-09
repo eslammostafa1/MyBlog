@@ -3,7 +3,6 @@ import User from "../schemas/User.schema";
 import { signupUserValidation, loginUserValidation } from "../validators/user.validator";
 
 class UserRepository {
-  // eslint-disable-next-line class-methods-use-this
   async getUsers(req, res) {
     let users;
     try {
@@ -19,7 +18,6 @@ class UserRepository {
     return users;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   async getUserById(req) {
     const { id } = req.params;
     let user;
@@ -31,8 +29,8 @@ class UserRepository {
     return user;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   async signup(req, res) {
+    // validate the user signup body object
     const { error, value } = signupUserValidation.validate(req.body, { abortEarly: false });
     if (error) {
       console.log(error);
@@ -55,11 +53,14 @@ class UserRepository {
         .json({ message: "User Exists!" });
     }
 
+    // make sure that user enter a correct new password
     if (password !== confirmPassword) {
       return res
         .status(400)
         .json({ message: "Wrong password" });
     }
+
+    // hash the password to save in the db
     const hashedPassword = bcrypt.hashSync(password);
 
     const user = new User({
@@ -78,8 +79,8 @@ class UserRepository {
     return user;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   async login(req, res) {
+    // validate the user login body object
     const { error, value } = loginUserValidation.validate(req.body, { abortEarly: false });
 
     if (error) {
@@ -98,6 +99,7 @@ class UserRepository {
       return res.status(404).json({ message: "You are not a user!" });
     }
 
+    // check the password that is hashed before that is equal to the login password
     const truePassword = bcrypt.compareSync(password, myUser.password);
 
     if (!truePassword) {

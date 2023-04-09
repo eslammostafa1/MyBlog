@@ -4,7 +4,6 @@ import User from "../schemas/User.schema";
 import blogValidation from "../validators/blog.validator";
 
 class BlogRepository {
-  // eslint-disable-next-line class-methods-use-this
   async getBlogs(req, res) {
     let myBlogs;
     try {
@@ -18,9 +17,8 @@ class BlogRepository {
     return myBlogs;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   async addBlog(req, res) {
-    console.log(req);
+    // validate the blog body object
     const { error, value } = blogValidation.validate(req.body, { abortEarly: false });
     if (error) {
       console.log(error);
@@ -42,6 +40,7 @@ class BlogRepository {
       writer,
     });
     try {
+    // start a seesion to make multiple commands on the db
       const session = await mongoose.startSession();
       session.startTransaction();
       await blog.save({ session });
@@ -56,7 +55,6 @@ class BlogRepository {
     return blog;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   async updateBlog(req, res) {
     const { title, description } = req.body;
     const blogId = req.params.id;
@@ -76,7 +74,6 @@ class BlogRepository {
     return blog;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   async deleteBlog(req) {
     const { id } = req.params;
 
@@ -91,7 +88,6 @@ class BlogRepository {
     return blog;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   async getByUserId(req) {
     const userId = req.params.id;
     let userBlogs;

@@ -15,6 +15,7 @@ module.exports = {
         "quotes": ["error", "double"],
         "semi": ["error", "always"],
         "max-lines": ["error", 300],
-        "no-console": 0
+        "no-console": 0,
+        "class-methods-use-this": 0,
     }
 }
