@@ -11,13 +11,13 @@ class UserService {
     return user;
   }
 
-  async signup(req, res) {
-    const user = await userRepository.signup(req, res);
+  async signup(req) {
+    const user = await userRepository.signup(req);
     return user;
   }
 
-  async login(req, res) {
-    const myUser = await userRepository.login(req, res);
+  async login(req) {
+    const myUser = await userRepository.login(req);
     return myUser;
   }
 }

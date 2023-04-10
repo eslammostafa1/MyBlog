@@ -1,19 +1,19 @@
 import BlogRepository from "../repository/blog.repository";
 
 class BlogService {
-  async getBlogs(req, res) {
-    const myBlogs = await BlogRepository.getBlogs(req, res);
+  async getBlogs() {
+    const myBlogs = await BlogRepository.getBlogs();
     return myBlogs;
   }
 
-  async addBlog(req, res) {
-    const myBlogs = await BlogRepository.addBlog(req, res);
+  async addBlog(req) {
+    const myBlogs = await BlogRepository.addBlog(req);
 
     return myBlogs;
   }
 
-  async updateBlog(req, res) {
-    const updateBlog = await BlogRepository.updateBlog(req, res);
+  async updateBlog(req) {
+    const updateBlog = await BlogRepository.updateBlog(req);
 
     return updateBlog;
   }

@@ -1,10 +1,9 @@
-// import Blog from "../schemas/Blog.schema";
-// import User from "../schemas/User.schema";
 import blogService from "../service/blog.service";
+import blogValidation from "../validators/blog.validator";
 
 class BlogController {
-  // get all blogs on the db
-  async getBlogs(req, res) {
+  // Retrieves all blog objects from a database.
+  async getBlogs(res) {
     try {
       const myBlogs = await blogService.getBlogs();
       return res.status(200).json({ myBlogs });
@@ -14,21 +13,26 @@ class BlogController {
     }
   }
 
-  // add new blog to db
+  // Adds a new blog object to a database.
   async addBlog(req, res) {
+    const { error } = blogValidation.validate(req.body, { abortEarly: false });
+    if (error) {
+      console.log(error);
+      return res.send({ error: error.message });
+    }
     try {
-      const blog = await blogService.addBlog(req, res);
+      const blog = await blogService.addBlog(req);
       return res.status(200).json({ blog });
-    } catch (error) {
-      console.log(`the error is :   ${error.message}`);
-      return res.status(400).json({ error: error.message });
+    } catch (err) {
+      console.log(`the error is :   ${err.message}`);
+      return res.status(400).json({ error: err.message });
     }
   }
 
-  // update a existing blog using id
+  // Update a existing blog using ID.
   async updateBlog(req, res) {
     try {
-      const blog = await blogService.updateBlog(req, res);
+      const blog = await blogService.updateBlog(req);
       return res.status(200).json({ blog });
     } catch (error) {
       console.log(`the error is :   ${error.message}`);
@@ -36,7 +40,7 @@ class BlogController {
     }
   }
 
-  // remove unwanted blog
+  // Deletes an existing blog object from database.
   async deleteBlog(req, res) {
     try {
       const blog = await blogService.deleteBlog(req);
@@ -50,7 +54,7 @@ class BlogController {
     }
   }
 
-  // get specific blog using id
+  // Retrieves all blog objects associated with a specific user ID from the database.
   async getByUserId(req, res) {
     try {
       const userBlogs = await blogService.getByUserId(req);

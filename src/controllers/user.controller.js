@@ -1,10 +1,11 @@
 import userService from "../service/user.service";
+import { signupUserValidation, loginUserValidation } from "../validators/user.validator";
 
 class UserController {
-  // get all user with the blogs
+  // Retrieves all user objects from the database.
   async getUsers(req, res) {
     try {
-      const users = await userService.getUsers(req, res);
+      const users = await userService.getUsers();
       return res.status(200).json({ users });
     } catch (error) {
       console.log(`the error is :   ${error.message}`);
@@ -12,7 +13,7 @@ class UserController {
     }
   }
 
-  // get a user by using his id
+  // Retrieves a single user object with a specific user ID from the database.
   async getUserById(req, res) {
     try {
       const user = await userService.getUserById(req);
@@ -26,8 +27,14 @@ class UserController {
     }
   }
 
-  // add a user to the db
+  // Creates a new user object in the database.
   async signup(req, res) {
+    // Validate the user signup body object
+    const { err } = signupUserValidation.validate(req.body, { abortEarly: false });
+    if (err) {
+      console.log(err);
+      return res.send(err.details);
+    }
     try {
       const user = await userService.signup(req);
       return res.status(201).json({ user });
@@ -37,8 +44,16 @@ class UserController {
     }
   }
 
-  // login an existing user
+  //  * Authenticates a user's login credentials against the database.
   async login(req, res) {
+    // Validate the user login body object
+    const { err } = loginUserValidation.validate(req.body, { abortEarly: false });
+
+    if (err) {
+      console.log(err);
+      throw new Error(err.details);
+    }
+
     try {
       const myUser = await userService.getUserById(req);
       return res

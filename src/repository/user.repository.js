@@ -1,9 +1,12 @@
 import bcrypt from "bcryptjs";
 import User from "../schemas/User.schema";
-import { signupUserValidation, loginUserValidation } from "../validators/user.validator";
 
 class UserRepository {
-  async getUsers(req, res) {
+  /**
+ * Retrieves all user objects from the database.
+ * @returns {Promise<object>} An object of all user objects in the database.
+ */
+  async getUsers() {
     let users;
     try {
       users = await User.find();
@@ -11,56 +14,55 @@ class UserRepository {
       return console.log(e);
     }
     if (!users) {
-      return res.status(404).json({
-        message: "No Users Found",
-      });
+      throw new Error(" No Users Found ");
     }
     return users;
   }
 
+  /**
+ * Retrieves a single user object with a specific user ID from the database.
+ * @param {Object} req - The request object containing the user ID.
+ * @returns {Promise<Object>} A Promise that resolves to the retrieved user object.
+ */
   async getUserById(req) {
     const { id } = req.params;
     let user;
     try {
       user = await User.findById(id);
     } catch (e) {
-      return console.log(e);
+      throw new Error(e);
     }
     return user;
   }
 
-  async signup(req, res) {
-    // validate the user signup body object
-    const { error, value } = signupUserValidation.validate(req.body, { abortEarly: false });
-    if (error) {
-      console.log(error);
-      return res.send(error.details);
-    }
+  /**
+ * Creates a new user object in the database.
+ * @param {Object} req - The request object containing the user's name, email, password,
+ *  and confirmPassword fields.
+ * @returns {Promise<Object>} A Promise that resolves to the created user object.
+ */
+  async signup(req) {
     const {
       name, email, password, confirmPassword,
-    } = value;
+    } = req.body;
 
     let myUser;
     try {
       myUser = await User.findOne({ email });
     } catch (e) {
-      return console.log(e);
+      throw new Error(e);
     }
 
     if (myUser) {
-      return res
-        .status(400)
-        .json({ message: "User Exists!" });
+      throw new Error("User Exists!");
     }
 
-    // make sure that user enter a correct new password
+    // Make sure that user enter a correct password.
     if (password !== confirmPassword) {
-      return res
-        .status(400)
-        .json({ message: "Wrong password" });
+      throw new Error("Wrong password");
     }
 
-    // hash the password to save in the db
+    // Hash the password to be able to save it in the database.
     const hashedPassword = bcrypt.hashSync(password);
 
     const user = new User({
@@ -74,36 +76,34 @@ class UserRepository {
       await user.save();
       console.log("user created");
     } catch (e) {
-      return console.log(e);
+      throw new Error(e);
     }
     return user;
   }
 
-  async login(req, res) {
-    // validate the user login body object
-    const { error, value } = loginUserValidation.validate(req.body, { abortEarly: false });
-
-    if (error) {
-      console.log(error);
-      return res.send(error.details);
-    }
-
-    const { email, password } = value;
+  /**
+ * Authenticates a user's login credentials against the database.
+ * @param {Object} req - The request object containing the user's email and password fields.
+ * @returns {Promise<Object>}  A Promise that resolves to the authenticated user object.
+ */
+  async login(req) {
+    const { email, password } = req.body;
     let myUser;
     try {
       myUser = await User.findOne({ email });
     } catch (e) {
-      return console.log(e);
+      throw new Error(e);
     }
     if (!myUser) {
-      return res.status(404).json({ message: "You are not a user!" });
+      throw new Error("You are not a user!");
     }
 
-    // check the password that is hashed before that is equal to the login password
+    // The function then compares the password provided in the request
+    // body with the hashed password stored in the user object using bcrypt.
     const truePassword = bcrypt.compareSync(password, myUser.password);
 
     if (!truePassword) {
-      return res.status(400).json({ message: "Incorrect Password" });
+      throw new Error("Incorrect Password");
     }
     return myUser;
   }

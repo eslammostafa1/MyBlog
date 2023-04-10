@@ -1,10 +1,13 @@
 import mongoose from "mongoose";
 import Blog from "../schemas/Blog.schema";
 import User from "../schemas/User.schema";
-import blogValidation from "../validators/blog.validator";
 
 class BlogRepository {
-  async getBlogs(req, res) {
+/**
+ * Retrieves all blog objects from a database.
+ * @returns {Promise<Array>} An array of all blog objects in the database.
+ */
+  async getBlogs() {
     let myBlogs;
     try {
       myBlogs = await Blog.find();
@@ -12,19 +15,18 @@ class BlogRepository {
       return console.log(err);
     }
     if (!myBlogs) {
-      return res.status(404).json({ message: "Can not find blog" });
+      throw new Error("Can not find blog");
     }
     return myBlogs;
   }
 
-  async addBlog(req, res) {
-    // validate the blog body object
-    const { error, value } = blogValidation.validate(req.body, { abortEarly: false });
-    if (error) {
-      console.log(error);
-      return res.send(error.details);
-    }
-    const { title, description, writer } = value;
+  /**
+ * Adds a new blog object to a database.
+ * @param {Object} req - The request object containing the title, description, and writer data.
+ * @returns {Promise<Object>} A Promise that resolves to the newly created blog object.
+ */
+  async addBlog(req) {
+    const { title, description, writer } = req.body;
     let myUser;
     try {
       myUser = await User.findById(writer);
@@ -32,7 +34,7 @@ class BlogRepository {
       return console.log(e);
     }
     if (!myUser) {
-      return res.status(400).json({ message: "User not found" });
+      throw new Error("User not found");
     }
     const blog = new Blog({
       title,
@@ -40,7 +42,7 @@ class BlogRepository {
       writer,
     });
     try {
-    // start a seesion to make multiple commands on the db
+    // Start a seesion to make multiple commands on the database.
       const session = await mongoose.startSession();
       session.startTransaction();
       await blog.save({ session });
@@ -48,14 +50,18 @@ class BlogRepository {
       await myUser.save({ session });
       await session.commitTransaction();
     } catch (err) {
-      console.log(err);
-      return res.status(500).json({ message: err });
+      throw new Error(err);
     }
 
     return blog;
   }
 
-  async updateBlog(req, res) {
+  /**
+ * Updates an existing blog object in the database.
+ * @param {Object} req - The request object the blog ID and updated title and description data.
+ * @returns {Promise<Object>} A Promise that resolves to the updated blog object.
+ */
+  async updateBlog(req) {
     const { title, description } = req.body;
     const blogId = req.params.id;
     let blog;
@@ -69,11 +75,16 @@ class BlogRepository {
       return console.log(e);
     }
     if (!blog) {
-      return res.status(500).json({ message: "Unable To Update The Blog" });
+      throw new Error("Unable To Update The Blog");
     }
     return blog;
   }
 
+  /**
+ * Deletes an existing blog object from database.
+ * @param {Object} req - The request object containing the blog ID.
+ * @returns {Promise<Object>} A Promise that resolves to the deleted blog object.
+ */
   async deleteBlog(req) {
     const { id } = req.params;
 
@@ -83,18 +94,24 @@ class BlogRepository {
       await blog.user.blogs.pull(blog);
       await blog.user.save();
     } catch (e) {
-      console.log(e);
+      throw new Error(e);
     }
     return blog;
   }
 
+  /**
+ * Retrieves all blog objects associated with a specific user ID from the database.
+ *  * @param {Object} req - The request object containing the user ID.
+ * @returns {Promise<Object>} A Promise that resolves to the user object with the populated
+ * "blogs" array.
+ */
   async getByUserId(req) {
     const userId = req.params.id;
     let userBlogs;
     try {
       userBlogs = await User.findById(userId).populate("blogs");
     } catch (e) {
-      return console.log(e);
+      throw new Error(e);
     }
     return userBlogs;
   }
