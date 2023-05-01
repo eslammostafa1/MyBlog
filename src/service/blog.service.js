@@ -6,6 +6,11 @@ class BlogService {
     return myBlogs;
   }
 
+  async getBlog(req) {
+    const myBlogs = await BlogRepository.getBlog(req);
+    return myBlogs;
+  }
+
   async addBlog(req) {
     const myBlogs = await BlogRepository.addBlog(req);
 

@@ -55,7 +55,8 @@ class UserController {
     }
 
     try {
-      const myUser = await userService.getUserById(req);
+      const myUser = await userService.login(req);
+      // console.log(`controller ${myUser}`);
       return res
         .status(200)
         .json({ message: "Login Successfull", user: myUser });

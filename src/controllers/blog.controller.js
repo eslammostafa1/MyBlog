@@ -3,10 +3,20 @@ import blogValidation from "../validators/blog.validator";
 
 class BlogController {
   // Retrieves all blog objects from a database.
-  async getBlogs(res) {
+  async getBlogs(req, res) {
     try {
       const myBlogs = await blogService.getBlogs();
       return res.status(200).json({ myBlogs });
+    } catch (error) {
+      console.log(`the error is :   ${error.message}`);
+      return res.status(400).json({ error: error.message });
+    }
+  }
+
+  async getBlog(req, res) {
+    try {
+      const myBlog = await blogService.getBlog(req);
+      return res.status(200).json({ myBlog });
     } catch (error) {
       console.log(`the error is :   ${error.message}`);
       return res.status(400).json({ error: error.message });

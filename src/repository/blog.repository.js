@@ -21,6 +21,25 @@ class BlogRepository {
   }
 
   /**
+ * Retrieves one blog objects from a database.
+ * @param {Object} req - The request object containing the blog ID.
+ * @returns {Promise<Array>} An blog object in the database.
+ */
+  async getBlog(req) {
+    const { id } = req.params;
+    let myBlog;
+    try {
+      myBlog = await Blog.findById(id);
+    } catch (err) {
+      return console.log(err);
+    }
+    if (!myBlog) {
+      throw new Error("Can not find blog");
+    }
+    return myBlog;
+  }
+
+  /**
  * Adds a new blog object to a database.
  * @param {Object} req - The request object containing the title, description, and writer data.
  * @returns {Promise<Object>} A Promise that resolves to the newly created blog object.
